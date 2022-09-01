@@ -1,43 +1,45 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
+import 'package:stream_pain/services/network.dart';
 
 class CheckNetworkStatus {
   bool isConn = true;
 
-  // static добавила
-  static StreamController _streamController = StreamController<bool>();
+  final _streamController = StreamController<bool>.broadcast();
 
   Stream<dynamic> get connUpdates => _streamController.stream;
-  // _streamController.stream.asBroadcastStream();
 
-  CheckNetworkStatus._privateConstructor();
+  Timer? timer;
 
-  static final CheckNetworkStatus _instance =
-      CheckNetworkStatus._privateConstructor();
+  CheckNetworkStatus._();
+
+  static final CheckNetworkStatus _instance = CheckNetworkStatus._();
 
   factory CheckNetworkStatus() {
     return _instance;
   }
 
   void changeStatus() {
+    print('changeStatus');
     isConn = !isConn;
+    if (!isConn) {
+      checkUpdates();
+    } else {
+      timer?.cancel();
+    }
     _streamController.add(isConn);
   }
 
   void checkUpdates() {
-    Timer.periodic(const Duration(seconds: 5), (timer) async {
+    timer = Timer.periodic(const Duration(seconds: 5), (timer) async {
       print(
-          "timer.tick = ------------------------ ${timer.tick} ------------------------");
+          "timer[${timer.hashCode}].tick = ------------------------ ${timer.tick} ------------------------");
       try {
-        dynamic res = await Dio().get(
-            "https://backend.specialscomedy.com/api/feed/products/057db18a-8368-4d84-bad8-5270cd634301");
-
-        if (res != null && res.data.isNotEmpty) {
-          changeStatus();
-          timer.cancel();
-        }
+        await Network("https://backend.specialscomedy.com/api")
+            .get("/feed/products/057db18a-8368-4d84-bad8-5270cd634301");
       } catch (e) {}
     });
+    print('[${timer.hashCode}] checkUpdates');
   }
 
   void dispose() {
