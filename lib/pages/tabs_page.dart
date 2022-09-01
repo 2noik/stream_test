@@ -44,11 +44,7 @@ class _TabsPageState extends State<TabsPage> {
         stream: CheckNetworkStatus().connUpdates,
         builder: (context, snapshot) {
           print(
-              " ------------------------ isConn snapshot: ${snapshot.data!} -----------------------------------");
-          if (snapshot.data! == false) {
-            CheckNetworkStatus().checkUpdates();
-          }
-
+              " ------------------------ isConn snapshot: ${snapshot.data!}, ${snapshot.connectionState}, ${snapshot.error} -----------------------------------");
           return CupertinoTabScaffold(
             controller: _tabController,
             tabBar: CupertinoTabBar(

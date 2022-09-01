@@ -5,7 +5,6 @@ import 'package:stream_pain/services/check_network_status.dart';
 import 'package:stream_pain/services/splash_screen.dart';
 
 void main() {
-  CheckNetworkStatus();
   runApp(const MyApp());
 }
 
